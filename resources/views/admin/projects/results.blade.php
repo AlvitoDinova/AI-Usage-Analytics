@@ -14,25 +14,68 @@
     </nav>
     <div class="d-flex align-items-center justify-content-between">
         <h4 class="mb-0 fw-bold">Hasil Rekomendasi TOPSIS</h4>
-        <a href="{{ route('projects.calculation', $project->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-2">
-            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Detail Perhitungan
-        </a>
+        <div class="d-flex gap-2">
+            @if(!$results->isEmpty() && isset($assessment))
+                <a href="{{ route('history.pdf', $assessment->id) }}" class="btn btn-sm btn-danger px-3 rounded-2" target="_blank">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Export PDF
+                </a>
+            @endif
+            <a href="{{ route('projects.calculation', $project->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-2">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i> Detail Perhitungan
+            </a>
+        </div>
     </div>
 </div>
 
 @if($results->isEmpty())
-    <div class="alert alert-warning border border-warning-subtle rounded-3 p-5 text-center">
-        <i class="bi bi-exclamation-triangle text-warning display-4 mb-3 d-block"></i>
-        <h5 class="fw-bold text-dark">Belum Ada Hasil Evaluasi</h5>
-        <p class="text-secondary small mb-4">Proyek ini belum dievaluasi menggunakan metode TOPSIS. Silakan jalankan proses perhitungan terlebih dahulu.</p>
-        <div class="d-flex justify-content-center gap-2">
-            <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-primary px-4 rounded-2">
-                <i class="bi bi-arrow-left me-1"></i> Kembali ke Detail Proyek
-            </a>
+    @if($assessment)
+        <div class="alert alert-warning border border-warning-subtle rounded-3 p-5 text-center">
+            <i class="bi bi-exclamation-triangle text-warning display-4 mb-3 d-block"></i>
+            <h5 class="fw-bold text-dark">Hasil Evaluasi Belum Tersedia</h5>
+            <p class="text-secondary small mb-4">Alternatif AI pada proyek telah berubah sehingga hasil evaluasi sebelumnya sudah tidak berlaku. Silakan jalankan kembali proses TOPSIS untuk memperoleh hasil terbaru.</p>
+            <div class="d-flex justify-content-center gap-2 align-items-center">
+                <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-outline-secondary px-4 rounded-2">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Detail Project
+                </a>
+                <form action="{{ route('projects.calculate', $project->id) }}" method="POST" class="m-0">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-primary px-4 rounded-2">
+                        <i class="bi bi-cpu-fill me-1"></i> Proses TOPSIS
+                    </button>
+                </form>
+            </div>
         </div>
-    </div>
+    @else
+        <div class="alert alert-warning border border-warning-subtle rounded-3 p-5 text-center">
+            <i class="bi bi-exclamation-triangle text-warning display-4 mb-3 d-block"></i>
+            <h5 class="fw-bold text-dark">Belum Ada Hasil Evaluasi</h5>
+            <p class="text-secondary small mb-4">Proyek ini belum dievaluasi menggunakan metode TOPSIS. Silakan jalankan proses perhitungan terlebih dahulu.</p>
+            <div class="d-flex justify-content-center gap-2">
+                <a href="{{ route('projects.show', $project->id) }}" class="btn btn-sm btn-primary px-4 rounded-2">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Detail Proyek
+                </a>
+            </div>
+        </div>
+    @endif
 @else
     <div class="row g-4">
+        <!-- Conclusion Card (FITUR 6) -->
+        @if($bestAi && $bestAi->aiTool)
+        <div class="col-12">
+            <div class="card border-primary-subtle bg-primary-subtle bg-opacity-10 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="text-primary fs-5"><i class="bi bi-info-circle-fill"></i></div>
+                        <h6 class="fw-bold text-primary mb-0" style="font-size: 0.8rem;">KESIMPULAN EVALUASI</h6>
+                    </div>
+                    <p class="text-dark small mb-0 leading-relaxed">
+                        Berdasarkan analisis multikriteria menggunakan metode TOPSIS untuk proyek <strong>{{ $project->nama_proyek }}</strong> ({{ $project->projectType->nama_proyek }}), alternatif <strong>{{ $bestAi->aiTool->nama_ai }}</strong> terpilih sebagai rekomendasi terbaik dengan nilai preferensi tertinggi sebesar <strong>{{ number_format($bestAi->nilai_preferensi, 6) }}</strong>. Hal ini menunjukkan bahwa {{ $bestAi->aiTool->nama_ai }} memiliki tingkat kecocokan yang paling optimal terhadap pembobotan kriteria proyek yang diinput oleh user.
+                    </p>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Highlight best AI tool -->
         <div class="col-12 col-lg-4">
             <div class="card bg-primary text-white border-0 h-100 shadow-sm overflow-hidden position-relative">
@@ -119,7 +162,7 @@
                                     <th>Alternatif AI Tool</th>
                                     <th>Developer / Pengembang</th>
                                     <th>Deskripsi Fungsionalitas</th>
-                                    <th class="text-end pe-4" style="width: 220px;">Nilai Preferensi (C_i*)</th>
+                                    <th class="text-end pe-4" style="width: 220px;">Nilai Preferensi</th>
                                 </tr>
                             </thead>
                             <tbody>

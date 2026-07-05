@@ -18,4 +18,9 @@ class ProjectType extends Model
     {
         return $this->hasMany(Project::class, 'project_type_id');
     }
+
+    public function aiTools()
+    {
+        return $this->belongsToMany(AITool::class, 'project_type_ai_tools', 'project_type_id', 'ai_tool_id')->withTimestamps();
+    }
 }

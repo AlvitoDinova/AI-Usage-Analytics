@@ -49,6 +49,7 @@
             padding: 1rem 0;
             z-index: 100;
             transition: all 0.3s ease;
+            overflow-y: auto;
         }
 
         .sidebar-brand {
@@ -209,6 +210,9 @@
             <li class="sidebar-menu-item {{ Request::is('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('dashboard') }}"><i class="bi bi-grid-fill"></i>Dashboard</a>
             </li>
+            <li class="sidebar-menu-item {{ Request::is('statistics*') ? 'active' : '' }}">
+                <a href="{{ route('statistics.index') }}"><i class="bi bi-bar-chart-fill"></i>Statistik SPK</a>
+            </li>
             
             <li class="sidebar-menu-header">Data Master</li>
             <li class="sidebar-menu-item {{ Request::is('ai-tools*') ? 'active' : '' }}">
@@ -223,16 +227,22 @@
             <li class="sidebar-menu-item {{ Request::is('project-types*') ? 'active' : '' }}">
                 <a href="{{ route('project-types.index') }}"><i class="bi bi-folder-fill"></i>Jenis Proyek</a>
             </li>
+            <li class="sidebar-menu-item {{ Request::is('ai-mappings*') ? 'active' : '' }}">
+                <a href="{{ route('ai-mappings.index') }}"><i class="bi bi-shuffle"></i>AI Mapping</a>
+            </li>
             <li class="sidebar-menu-item {{ Request::is('matrix*') ? 'active' : '' }}">
                 <a href="{{ route('matrix.index') }}"><i class="bi bi-grid-3x3-gap-fill"></i>Matriks Keputusan</a>
+            </li>
+            <li class="sidebar-menu-item {{ Request::is('activity-logs*') ? 'active' : '' }}">
+                <a href="{{ route('activity-logs.index') }}"><i class="bi bi-file-earmark-medical-fill"></i>Log Aktivitas</a>
             </li>
             
             <li class="sidebar-menu-header">SPK TOPSIS</li>
             <li class="sidebar-menu-item {{ Request::is('projects*') ? 'active' : '' }}">
                 <a href="{{ route('projects.index') }}"><i class="bi bi-calculator-fill"></i>Penilaian Proyek</a>
             </li>
-            <li class="sidebar-menu-item {{ Request::is('coming-soon*') ? 'active' : '' }}">
-                <a href="{{ route('coming-soon') }}"><i class="bi bi-journal-text"></i>Riwayat Evaluasi</a>
+            <li class="sidebar-menu-item {{ Request::is('history*') ? 'active' : '' }}">
+                <a href="{{ route('history.index') }}"><i class="bi bi-journal-text"></i>Riwayat Evaluasi</a>
             </li>
         </ul>
     </div>

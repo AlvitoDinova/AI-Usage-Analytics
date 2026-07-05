@@ -17,14 +17,14 @@ class TopsisService
 {
     public function calculate(Project $project): array
     {
-        // 1. Initial Assessment check
-        $assessment = Assessment::firstOrCreate(
-            ['project_id' => $project->id],
-            ['tanggal_penilaian' => now()]
-        );
+        // 1. Create a new Assessment record for this evaluation run
+        $assessment = Assessment::create([
+            'project_id' => $project->id,
+            'tanggal_penilaian' => now()->toDateString()
+        ]);
 
         $criteria = Criterion::orderBy('id', 'asc')->get();
-        $aiTools = AITool::where('status', 'aktif')->orderBy('id', 'asc')->get();
+        $aiTools = $project->aiTools()->orderBy('id', 'asc')->get();
 
         if ($aiTools->isEmpty() || $criteria->isEmpty()) {
             throw new \Exception("Kalkulasi gagal. Data AI Tools aktif atau Kriteria tidak boleh kosong.");
@@ -141,7 +141,7 @@ class TopsisService
         $preferences = [];
         foreach ($aiTools as $ai) {
             $dividerCi = $dPlus[$ai->id] + $dMinus[$ai->id];
-            $preferences[$ai->id] = ($dividerCi == 0) ? 0.0 : ($dMinus[$ai->id] / $dividerCi);
+            $preferences[$ai->id] = ($dividerCi == 0) ? 0.5 : ($dMinus[$ai->id] / $dividerCi);
         }
 
         // 8. Sorting and Ranking
@@ -158,10 +158,6 @@ class TopsisService
 
         // 9. Save final ranks & steps under Transaction
         DB::transaction(function () use ($assessment, $rankings, $x, $r, $y, $aPlus, $aMinus, $dPlus, $dMinus, $preferences) {
-            // Clear old results
-            TopsisResult::where('assessment_id', $assessment->id)->delete();
-            CalculationLog::where('assessment_id', $assessment->id)->delete();
-
             // Insert new rankings
             foreach ($rankings as $row) {
                 TopsisResult::create([

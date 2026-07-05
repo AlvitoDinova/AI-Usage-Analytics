@@ -63,4 +63,15 @@ class ProjectTypeController extends Controller
                 ->with('error', 'Gagal menghapus. Data jenis proyek ini sedang digunakan oleh transaksi proyek.');
         }
     }
+
+    public function getAiTools(ProjectType $projectType)
+    {
+        $mapped = $projectType->aiTools()->where('status', 'aktif')->orderBy('nama_ai', 'asc')->get();
+        $allActive = \App\Models\AITool::where('status', 'aktif')->orderBy('nama_ai', 'asc')->get();
+
+        return response()->json([
+            'mapped' => $mapped,
+            'all' => $allActive,
+        ]);
+    }
 }

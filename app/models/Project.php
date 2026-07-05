@@ -28,4 +28,9 @@ class Project extends Model
     {
         return $this->hasOne(Assessment::class, 'project_id');
     }
+
+    public function aiTools()
+    {
+        return $this->belongsToMany(AITool::class, 'project_ai_tools', 'project_id', 'ai_tool_id')->withTimestamps();
+    }
 }

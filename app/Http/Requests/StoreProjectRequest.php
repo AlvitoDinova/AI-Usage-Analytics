@@ -20,6 +20,8 @@ class StoreProjectRequest extends FormRequest
             'tanggal' => 'required|date',
             'status' => 'required|in:Draft,Dinilai,Selesai',
             'deskripsi' => 'nullable|string',
+            'ai_tools' => 'required|array|min:2',
+            'ai_tools.*' => 'exists:ai_tools,id',
         ];
     }
 
@@ -34,6 +36,10 @@ class StoreProjectRequest extends FormRequest
             'tanggal.date' => 'Format tanggal tidak valid.',
             'status.required' => 'Status proyek wajib dipilih.',
             'status.in' => 'Status proyek tidak valid.',
+            'ai_tools.required' => 'Alternatif AI wajib dipilih.',
+            'ai_tools.array' => 'Format alternatif AI tidak valid.',
+            'ai_tools.min' => 'Pilih setidaknya 2 alternatif AI untuk proyek.',
+            'ai_tools.*.exists' => 'Alternatif AI terpilih tidak valid.',
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AITool;
 use App\Models\Statistic;
+use App\Models\ActivityLog;
 use App\Http\Requests\StoreAIToolRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -41,8 +42,12 @@ class AIToolController extends Controller
 
     public function store(StoreAIToolRequest $request): RedirectResponse
     {
-        AITool::create($request->validated());
+        $aiTool = AITool::create($request->validated());
         $this->updateStatsCache();
+
+        ActivityLog::create([
+            'aktivitas' => "Menambahkan alternatif AI Tool baru: '{$aiTool->nama_ai}'."
+        ]);
 
         return redirect()->route('ai-tools.index')
             ->with('success', 'Data AI Tool baru berhasil ditambahkan.');
@@ -63,14 +68,23 @@ class AIToolController extends Controller
         $aiTool->update($request->validated());
         $this->updateStatsCache();
 
+        ActivityLog::create([
+            'aktivitas' => "Mengubah data AI Tool: '{$aiTool->nama_ai}'."
+        ]);
+
         return redirect()->route('ai-tools.index')
             ->with('success', 'Data AI Tool berhasil diperbarui.');
     }
 
     public function destroy(AITool $aiTool): RedirectResponse
     {
+        $aiName = $aiTool->nama_ai;
         $aiTool->delete();
         $this->updateStatsCache();
+
+        ActivityLog::create([
+            'aktivitas' => "Menghapus AI Tool: '{$aiName}'."
+        ]);
 
         return redirect()->route('ai-tools.index')
             ->with('success', 'Data AI Tool berhasil dihapus.');

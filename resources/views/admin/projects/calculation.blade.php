@@ -37,27 +37,27 @@
             <ul class="nav nav-pills flex-column flex-sm-row gap-2" id="topsisTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active btn-sm text-start text-sm-center" id="matrix-tab" data-bs-toggle="tab" data-bs-target="#matrix" type="button" role="tab" aria-controls="matrix" aria-selected="true">
-                        A. Matriks Awal (X)
+                        A. Matriks Keputusan Awal
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link btn-sm text-start text-sm-center" id="norm-tab" data-bs-toggle="tab" data-bs-target="#norm" type="button" role="tab" aria-controls="norm" aria-selected="false">
-                        B. Normalisasi (R)
+                        B. Normalisasi Matriks
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link btn-sm text-start text-sm-center" id="weighted-tab" data-bs-toggle="tab" data-bs-target="#weighted" type="button" role="tab" aria-controls="weighted" aria-selected="false">
-                        C. Terbobot (Y)
+                        C. Matriks Ternormalisasi Berbobot
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link btn-sm text-start text-sm-center" id="ideal-tab" data-bs-toggle="tab" data-bs-target="#ideal" type="button" role="tab" aria-controls="ideal" aria-selected="false">
-                        D-E. Solusi Ideal
+                        D-E. Solusi Ideal Positif dan Negatif
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link btn-sm text-start text-sm-center" id="final-tab" data-bs-toggle="tab" data-bs-target="#final" type="button" role="tab" aria-controls="final" aria-selected="false">
-                        F-H. Jarak & Preferensi
+                        F-H. Jarak dan Nilai Preferensi
                     </button>
                 </li>
             </ul>
@@ -69,7 +69,7 @@
         <div class="tab-pane fade show active" id="matrix" role="tabpanel" aria-labelledby="matrix-tab">
             <div class="card">
                 <div class="card-header bg-white border-0 pt-3">
-                    <h6 class="card-header-title">A. Matriks Keputusan Awal (X)</h6>
+                    <h6 class="card-header-title">A. Matriks Keputusan Awal</h6>
                     <p class="text-secondary small mb-0">Nilai kinerja alternatif AI terhadap masing-masing kriteria (skala 1-5).</p>
                 </div>
                 <div class="card-body p-0">
@@ -106,8 +106,8 @@
         <div class="tab-pane fade" id="norm" role="tabpanel" aria-labelledby="norm-tab">
             <div class="card">
                 <div class="card-header bg-white border-0 pt-3">
-                    <h6 class="card-header-title">B. Matriks Ternormalisasi (R)</h6>
-                    <p class="text-secondary small mb-0">Proses normalisasi Euclidean: $r_{ij} = \frac{x_{ij}}{\sqrt{\sum_{i=1}^{m} x_{ij}^2}}$</p>
+                    <h6 class="card-header-title">B. Normalisasi Matriks</h6>
+                    <p class="text-secondary small mb-0">Proses pembagian nilai kinerja alternatif dengan akar jumlah kuadrat kriteria.</p>
                 </div>
                 <div class="card-body p-0">
                     @php
@@ -145,8 +145,8 @@
         <div class="tab-pane fade" id="weighted" role="tabpanel" aria-labelledby="weighted-tab">
             <div class="card">
                 <div class="card-header bg-white border-0 pt-3">
-                    <h6 class="card-header-title">C. Matriks Keputusan Terbobot (Y)</h6>
-                    <p class="text-secondary small mb-0">Pembobotan ternormalisasi: $y_{ij} = w'_j \times r_{ij}$</p>
+                    <h6 class="card-header-title">C. Matriks Ternormalisasi Berbobot</h6>
+                    <p class="text-secondary small mb-0">Proses perkalian matriks ternormalisasi dengan bobot kepentingan kriteria.</p>
                 </div>
                 <div class="card-body p-0">
                     @php
@@ -184,8 +184,8 @@
         <div class="tab-pane fade" id="ideal" role="tabpanel" aria-labelledby="ideal-tab">
             <div class="card">
                 <div class="card-header bg-white border-0 pt-3">
-                    <h6 class="card-header-title">D & E. Nilai Solusi Ideal Positif ($A^+$) dan Negatif ($A^-$)</h6>
-                    <p class="text-secondary small mb-0">Dipetakan berdasarkan tipe kriteria (Benefit = Max/Min, Cost = Min/Max).</p>
+                    <h6 class="card-header-title">D & E. Solusi Ideal Positif dan Negatif</h6>
+                    <p class="text-secondary small mb-0">Nilai terbaik (maksimum untuk Benefit, minimum untuk Cost) dan terburuk untuk setiap kriteria.</p>
                 </div>
                 <div class="card-body p-0">
                     @php
@@ -204,7 +204,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="text-start ps-3 fw-bold text-success"><i class="bi bi-plus-circle-fill me-1"></i>Positif ($A^+$)</td>
+                                    <td class="text-start ps-3 fw-bold text-success"><i class="bi bi-plus-circle-fill me-1"></i>Solusi Ideal Positif</td>
                                     @foreach($criteria as $c)
                                         <td class="font-monospace text-success fw-bold">
                                             {{ isset($aPlus[$c->id]) ? number_format($aPlus[$c->id], 6) : '-' }}
@@ -212,7 +212,7 @@
                                     @endforeach
                                 </tr>
                                 <tr>
-                                    <td class="text-start ps-3 fw-bold text-danger"><i class="bi bi-dash-circle-fill me-1"></i>Negatif ($A^-$)</td>
+                                    <td class="text-start ps-3 fw-bold text-danger"><i class="bi bi-dash-circle-fill me-1"></i>Solusi Ideal Negatif</td>
                                     @foreach($criteria as $c)
                                         <td class="font-monospace text-danger fw-bold">
                                             {{ isset($aMinus[$c->id]) ? number_format($aMinus[$c->id], 6) : '-' }}
@@ -230,8 +230,8 @@
         <div class="tab-pane fade" id="final" role="tabpanel" aria-labelledby="final-tab">
             <div class="card">
                 <div class="card-header bg-white border-0 pt-3">
-                    <h6 class="card-header-title">F, G & H. Jarak Solusi, Preferensi Relatif ($C_i^*$) & Urutan Peringkat</h6>
-                    <p class="text-secondary small mb-0">Rumus preferensi: $C_i = \frac{D_i^-}{D_i^+ + D_i^-}$</p>
+                    <h6 class="card-header-title">F, G & H. Perhitungan Jarak, Nilai Preferensi, dan Peringkat Alternatif AI</h6>
+                    <p class="text-secondary small mb-0">Perhitungan kedekatan relatif setiap alternatif terhadap solusi ideal.</p>
                 </div>
                 <div class="card-body p-0">
                     @php
@@ -249,9 +249,9 @@
                                 <tr>
                                     <th class="text-center" style="width: 100px;">Rank</th>
                                     <th>Alternatif AI Tool</th>
-                                    <th class="text-center">Jarak ke Solusi Ideal Positif ($D_i^+$)</th>
-                                    <th class="text-center">Jarak ke Solusi Ideal Negatif ($D_i^-$)</th>
-                                    <th class="text-end pe-4" style="width: 200px;">Nilai Preferensi ($C_i^*$)</th>
+                                    <th class="text-center">Jarak ke Solusi Ideal Positif</th>
+                                    <th class="text-center">Jarak ke Solusi Ideal Negatif</th>
+                                    <th class="text-end pe-4" style="width: 200px;">Nilai Preferensi</th>
                                 </tr>
                             </thead>
                             <tbody>

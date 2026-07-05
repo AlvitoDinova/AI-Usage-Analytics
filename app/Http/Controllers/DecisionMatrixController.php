@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\AITool;
 use App\Models\Criterion;
 use App\Models\MatrixValue;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -26,8 +27,8 @@ class DecisionMatrixController extends Controller
         if ($selectedProjectId) {
             $selectedProject = Project::find($selectedProjectId);
             if ($selectedProject) {
-                // Fetch active AI tools and active Criteria
-                $aiTools = AITool::where('status', 'aktif')->orderBy('id', 'asc')->get();
+                // Fetch project-specific AI Tools and active Criteria
+                $aiTools = $selectedProject->aiTools()->orderBy('id', 'asc')->get();
                 $criteria = Criterion::orderBy('id', 'asc')->get();
                 
                 // Fetch matrix values ISOLATED by project_id
@@ -74,6 +75,10 @@ class DecisionMatrixController extends Controller
             // Update status of project to "Dinilai"
             $project->update(['status' => 'Dinilai']);
         });
+
+        ActivityLog::create([
+            'aktivitas' => "Memperbarui matriks keputusan untuk proyek: '{$project->nama_proyek}'."
+        ]);
 
         return redirect()->route('matrix.index', ['project_id' => $project->id])
             ->with('success', "Matriks keputusan berhasil disimpan. Status proyek '{$project->nama_proyek}' diperbarui menjadi 'Dinilai'.");

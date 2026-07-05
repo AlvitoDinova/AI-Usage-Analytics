@@ -48,13 +48,19 @@ class ProjectController extends Controller
     public function create(): View
     {
         $projectTypes = ProjectType::orderBy('nama_proyek', 'asc')->get();
-        return view('admin.projects.create', compact('projectTypes'));
+        $allAiTools = AITool::where('status', 'aktif')->orderBy('nama_ai', 'asc')->get();
+        return view('admin.projects.create', compact('projectTypes', 'allAiTools'));
     }
 
     public function store(StoreProjectRequest $request): RedirectResponse
     {
-        Project::create($request->validated());
+        $project = Project::create($request->validated());
+        $project->aiTools()->sync($request->input('ai_tools', []));
         $this->updateStatsCache();
+
+        ActivityLog::create([
+            'aktivitas' => "Membuat proyek baru: '{$project->nama_proyek}'."
+        ]);
 
         return redirect()->route('projects.index')
             ->with('success', 'Data Proyek baru berhasil ditambahkan.');
@@ -64,8 +70,8 @@ class ProjectController extends Controller
     {
         $project->load('projectType');
         
-        // Fetch active AI Tools and Criteria to build the Decision Matrix representation
-        $aiTools = AITool::where('status', 'aktif')->orderBy('id', 'asc')->get();
+        // Fetch project-specific AI Tools and Criteria to build the Decision Matrix representation
+        $aiTools = $project->aiTools()->orderBy('id', 'asc')->get();
         $criteria = Criterion::orderBy('id', 'asc')->get();
         
         // Fetch raw matrix scores to show inside the details view isolated by project
@@ -77,22 +83,53 @@ class ProjectController extends Controller
     public function edit(Project $project): View
     {
         $projectTypes = ProjectType::orderBy('nama_proyek', 'asc')->get();
-        return view('admin.projects.edit', compact('project', 'projectTypes'));
+        $allAiTools = AITool::where('status', 'aktif')->orderBy('nama_ai', 'asc')->get();
+        $selectedAiIds = $project->aiTools->pluck('id')->toArray();
+        return view('admin.projects.edit', compact('project', 'projectTypes', 'allAiTools', 'selectedAiIds'));
     }
 
     public function update(StoreProjectRequest $request, Project $project): RedirectResponse
     {
-        $project->update($request->validated());
+        $oldAiIds = $project->aiTools->pluck('id')->toArray();
+        $newAiIds = array_map('intval', $request->input('ai_tools', []));
+
+        sort($oldAiIds);
+        sort($newAiIds);
+
+        $aiListChanged = ($oldAiIds !== $newAiIds);
+
+        $validated = $request->validated();
+        if ($aiListChanged) {
+            $validated['status'] = 'Draft';
+        }
+
+        $project->update($validated);
+        $project->aiTools()->sync($newAiIds);
+        
+        // Clean up matrix values for AI tools that were overridden/removed from the project
+        MatrixValue::where('project_id', $project->id)
+            ->whereNotIn('ai_id', $newAiIds)
+            ->delete();
+
         $this->updateStatsCache();
 
+        ActivityLog::create([
+            'aktivitas' => "Memperbarui data proyek: '{$project->nama_proyek}'."
+        ]);
+
         return redirect()->route('projects.index')
-            ->with('success', 'Data Proyek berhasil diperbarui.');
+            ->with('success', 'Data Proyek berhasil diperbarui.' . ($aiListChanged ? ' Daftar AI berubah, hasil TOPSIS sebelumnya direset.' : ''));
     }
 
     public function destroy(Project $project): RedirectResponse
     {
+        $projectName = $project->nama_proyek;
         $project->delete();
         $this->updateStatsCache();
+
+        ActivityLog::create([
+            'aktivitas' => "Menghapus proyek: '{$projectName}'."
+        ]);
 
         return redirect()->route('projects.index')
             ->with('success', 'Data Proyek berhasil dihapus.');
@@ -131,7 +168,7 @@ class ProjectController extends Controller
 
     public function results(Project $project): View
     {
-        $assessment = Assessment::where('project_id', $project->id)->first();
+        $assessment = Assessment::where('project_id', $project->id)->orderBy('id', 'desc')->first();
         
         $results = collect();
         $bestAi = null;
@@ -149,7 +186,7 @@ class ProjectController extends Controller
 
     public function calculationDetails(Project $project): View
     {
-        $assessment = Assessment::where('project_id', $project->id)->first();
+        $assessment = Assessment::where('project_id', $project->id)->orderBy('id', 'desc')->first();
 
         $logs = [];
         if ($assessment) {
@@ -158,7 +195,7 @@ class ProjectController extends Controller
                 ->toArray();
         }
 
-        $aiTools = AITool::where('status', 'aktif')->orderBy('id', 'asc')->get();
+        $aiTools = $project->aiTools()->orderBy('id', 'asc')->get();
         $criteria = Criterion::orderBy('id', 'asc')->get();
 
         return view('admin.projects.calculation', compact('project', 'logs', 'aiTools', 'criteria'));
