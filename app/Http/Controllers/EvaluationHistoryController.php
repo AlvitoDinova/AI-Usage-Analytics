@@ -35,6 +35,9 @@ class EvaluationHistoryController extends Controller
                 'project_types.nama_proyek as jenis_proyek'
             )
             ->whereHas('topsisResults')
+            ->when(auth()->user()->role === 'employee', function ($query) {
+                return $query->where('projects.owner_id', auth()->id());
+            })
             ->with(['topsisResults' => function ($q) {
                 $q->orderBy('ranking', 'asc');
             }, 'topsisResults.aiTool'])
@@ -71,6 +74,10 @@ class EvaluationHistoryController extends Controller
                 ->with('error', 'Proyek terkait evaluasi ini tidak ditemukan.');
         }
 
+        if (auth()->user()->role === 'employee' && $project->owner_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki hak akses untuk riwayat evaluasi ini.');
+        }
+
         $results = $assessment->topsisResults()->orderBy('ranking', 'asc')->get();
         $bestAi = $results->first();
 
@@ -90,6 +97,10 @@ class EvaluationHistoryController extends Controller
         if (!$project) {
             return redirect()->back()
                 ->with('error', 'Proyek terkait evaluasi ini tidak ditemukan.');
+        }
+
+        if (auth()->user()->role === 'employee' && $project->owner_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki hak akses untuk riwayat evaluasi ini.');
         }
 
         $results = $assessment->topsisResults()->orderBy('ranking', 'asc')->get();

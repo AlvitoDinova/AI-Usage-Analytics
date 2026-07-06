@@ -16,7 +16,12 @@ class DecisionMatrixController extends Controller
 {
     public function index(Request $request): View
     {
-        $projects = Project::orderBy('id', 'desc')->get();
+        $user = auth()->user();
+        if ($user->role === 'employee') {
+            $projects = Project::where('owner_id', $user->id)->orderBy('id', 'desc')->get();
+        } else {
+            $projects = Project::orderBy('id', 'desc')->get();
+        }
         $selectedProjectId = $request->input('project_id');
 
         $selectedProject = null;
@@ -27,6 +32,11 @@ class DecisionMatrixController extends Controller
         if ($selectedProjectId) {
             $selectedProject = Project::find($selectedProjectId);
             if ($selectedProject) {
+                // Scoping check for employee
+                if ($user->role === 'employee' && $selectedProject->owner_id !== $user->id) {
+                    abort(403, 'Anda tidak memiliki hak akses untuk proyek ini.');
+                }
+
                 // Fetch project-specific AI Tools and active Criteria
                 $aiTools = $selectedProject->aiTools()->orderBy('id', 'asc')->get();
                 $criteria = Criterion::orderBy('id', 'asc')->get();
@@ -45,6 +55,11 @@ class DecisionMatrixController extends Controller
         $scores = $request->input('scores', []); // Nested array: scores[ai_id][criteria_id] = score_value
 
         $project = Project::findOrFail($projectId);
+        
+        // Scoping check for employee
+        if (auth()->user()->role === 'employee' && $project->owner_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki hak akses untuk proyek ini.');
+        }
 
         // Validation: verify that all inputs are filled and score scale is between 1 and 5
         foreach ($scores as $aiId => $criteriaScores) {

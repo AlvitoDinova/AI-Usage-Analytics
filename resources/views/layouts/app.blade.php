@@ -210,40 +210,73 @@
             <li class="sidebar-menu-item {{ Request::is('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('dashboard') }}"><i class="bi bi-grid-fill"></i>Dashboard</a>
             </li>
-            <li class="sidebar-menu-item {{ Request::is('statistics*') ? 'active' : '' }}">
-                <a href="{{ route('statistics.index') }}"><i class="bi bi-bar-chart-fill"></i>Statistik SPK</a>
-            </li>
             
-            <li class="sidebar-menu-header">Data Master</li>
-            <li class="sidebar-menu-item {{ Request::is('ai-tools*') ? 'active' : '' }}">
-                <a href="{{ route('ai-tools.index') }}"><i class="bi bi-robot"></i>Data AI Tools</a>
-            </li>
-            <li class="sidebar-menu-item {{ Request::is('criteria*') ? 'active' : '' }}">
-                <a href="{{ route('criteria.index') }}"><i class="bi bi-list-stars"></i>Data Kriteria</a>
-            </li>
-            <li class="sidebar-menu-item {{ Request::is('criterion-weights*') ? 'active' : '' }}">
-                <a href="{{ route('criterion-weights.index') }}"><i class="bi bi-percent"></i>Bobot Kriteria</a>
-            </li>
-            <li class="sidebar-menu-item {{ Request::is('project-types*') ? 'active' : '' }}">
-                <a href="{{ route('project-types.index') }}"><i class="bi bi-folder-fill"></i>Jenis Proyek</a>
-            </li>
-            <li class="sidebar-menu-item {{ Request::is('ai-mappings*') ? 'active' : '' }}">
-                <a href="{{ route('ai-mappings.index') }}"><i class="bi bi-shuffle"></i>AI Mapping</a>
-            </li>
-            <li class="sidebar-menu-item {{ Request::is('matrix*') ? 'active' : '' }}">
-                <a href="{{ route('matrix.index') }}"><i class="bi bi-grid-3x3-gap-fill"></i>Matriks Keputusan</a>
-            </li>
-            <li class="sidebar-menu-item {{ Request::is('activity-logs*') ? 'active' : '' }}">
-                <a href="{{ route('activity-logs.index') }}"><i class="bi bi-file-earmark-medical-fill"></i>Log Aktivitas</a>
-            </li>
-            
-            <li class="sidebar-menu-header">SPK TOPSIS</li>
-            <li class="sidebar-menu-item {{ Request::is('projects*') ? 'active' : '' }}">
-                <a href="{{ route('projects.index') }}"><i class="bi bi-calculator-fill"></i>Penilaian Proyek</a>
-            </li>
-            <li class="sidebar-menu-item {{ Request::is('history*') ? 'active' : '' }}">
-                <a href="{{ route('history.index') }}"><i class="bi bi-journal-text"></i>Riwayat Evaluasi</a>
-            </li>
+            @if(auth()->check())
+                @if(auth()->user()->role === 'admin')
+                    <li class="sidebar-menu-item {{ Request::is('statistics*') ? 'active' : '' }}">
+                        <a href="{{ route('statistics.index') }}"><i class="bi bi-bar-chart-fill"></i>Statistik SPK</a>
+                    </li>
+                    
+                    <li class="sidebar-menu-header">Data Master</li>
+                    <li class="sidebar-menu-item {{ Request::is('ai-tools*') ? 'active' : '' }}">
+                        <a href="{{ route('ai-tools.index') }}"><i class="bi bi-robot"></i>Data AI Tools</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('criteria*') ? 'active' : '' }}">
+                        <a href="{{ route('criteria.index') }}"><i class="bi bi-list-stars"></i>Data Kriteria</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('criterion-weights*') ? 'active' : '' }}">
+                        <a href="{{ route('criterion-weights.index') }}"><i class="bi bi-percent"></i>Bobot Kriteria</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('project-types*') ? 'active' : '' }}">
+                        <a href="{{ route('project-types.index') }}"><i class="bi bi-folder-fill"></i>Jenis Proyek</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('ai-mappings*') ? 'active' : '' }}">
+                        <a href="{{ route('ai-mappings.index') }}"><i class="bi bi-shuffle"></i>AI Mapping</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('matrix*') ? 'active' : '' }}">
+                        <a href="{{ route('matrix.index') }}"><i class="bi bi-grid-3x3-gap-fill"></i>Matriks Keputusan</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('activity-logs*') ? 'active' : '' }}">
+                        <a href="{{ route('activity-logs.index') }}"><i class="bi bi-file-earmark-medical-fill"></i>Log Aktivitas</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('users*') ? 'active' : '' }}">
+                        <a href="{{ route('users.index') }}"><i class="bi bi-people-fill"></i>Manajemen User</a>
+                    </li>
+                    
+                    <li class="sidebar-menu-header">SPK TOPSIS</li>
+                    <li class="sidebar-menu-item {{ Request::is('projects*') ? 'active' : '' }}">
+                        <a href="{{ route('projects.index') }}"><i class="bi bi-calculator-fill"></i>Penilaian Proyek</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('history*') ? 'active' : '' }}">
+                        <a href="{{ route('history.index') }}"><i class="bi bi-journal-text"></i>Riwayat Evaluasi</a>
+                    </li>
+
+                @elseif(auth()->user()->role === 'manager')
+                    <li class="sidebar-menu-item {{ Request::is('statistics*') ? 'active' : '' }}">
+                        <a href="{{ route('statistics.index') }}"><i class="bi bi-bar-chart-fill"></i>Statistik SPK</a>
+                    </li>
+                    
+                    <li class="sidebar-menu-header">SPK TOPSIS</li>
+                    <li class="sidebar-menu-item {{ Request::is('projects*') ? 'active' : '' }}">
+                        <a href="{{ route('projects.index') }}"><i class="bi bi-calculator-fill"></i>Penilaian Proyek</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('history*') ? 'active' : '' }}">
+                        <a href="{{ route('history.index') }}"><i class="bi bi-journal-text"></i>Riwayat Evaluasi</a>
+                    </li>
+
+                @elseif(auth()->user()->role === 'employee')
+                    <li class="sidebar-menu-header">SPK TOPSIS</li>
+                    <li class="sidebar-menu-item {{ Request::is('projects*') ? 'active' : '' }}">
+                        <a href="{{ route('projects.index') }}"><i class="bi bi-calculator-fill"></i>Project Saya</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('matrix*') ? 'active' : '' }}">
+                        <a href="{{ route('matrix.index') }}"><i class="bi bi-grid-3x3-gap-fill"></i>Input Matriks</a>
+                    </li>
+                    <li class="sidebar-menu-item {{ Request::is('history*') ? 'active' : '' }}">
+                        <a href="{{ route('history.index') }}"><i class="bi bi-journal-text"></i>Riwayat Saya</a>
+                    </li>
+                @endif
+            @endif
         </ul>
     </div>
 
@@ -254,8 +287,34 @@
                 <h6 class="topbar-title">Notch Creative Agency — Dashboard</h6>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="font-size: 0.65rem;">DEV MODE</span>
-                <span class="topbar-date" id="live-time"></span>
+                <span class="topbar-date d-none d-md-inline" id="live-time"></span>
+                @if(auth()->check())
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light border dropdown-toggle d-flex align-items-center gap-2 rounded-2" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="fw-semibold">{{ auth()->user()->name }}</span>
+                            @if(auth()->user()->role === 'admin')
+                                <span class="badge bg-danger-subtle text-danger" style="font-size: 0.65rem;">Admin</span>
+                            @elseif(auth()->user()->role === 'manager')
+                                <span class="badge bg-warning-subtle text-warning text-dark" style="font-size: 0.65rem;">Manager</span>
+                            @else
+                                <span class="badge bg-info-subtle text-info text-dark" style="font-size: 0.65rem;">Employee</span>
+                            @endif
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-light-subtle rounded-3" aria-labelledby="userDropdown">
+                            <li><h6 class="dropdown-header text-muted small">Status: Aktif</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="px-2">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-danger text-white w-100 rounded-2 text-start">
+                                        <i class="bi bi-box-arrow-right me-1"></i> Keluar
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @endif
             </div>
         </div>
 

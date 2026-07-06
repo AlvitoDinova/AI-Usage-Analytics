@@ -15,7 +15,7 @@
 
 <!-- KPI Cards Row -->
 <div class="row g-4 mb-4">
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="card h-100 shadow-sm border-0 bg-white card-hover">
             <div class="card-body p-3 d-flex align-items-center justify-content-between">
                 <div>
@@ -29,7 +29,7 @@
         </div>
     </div>
     
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="card h-100 shadow-sm border-0 bg-white card-hover">
             <div class="card-body p-3 d-flex align-items-center justify-content-between">
                 <div>
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="card h-100 shadow-sm border-0 bg-white card-hover">
             <div class="card-body p-3 d-flex align-items-center justify-content-between">
                 <div>
@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div class="col-12 col-md-6 col-lg-3">
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="card h-100 shadow-sm border-0 bg-white card-hover">
             <div class="card-body p-3 d-flex align-items-center justify-content-between">
                 <div>
@@ -74,7 +74,7 @@
 
 <div class="row g-4">
     <!-- Top AI Tools Ranked 1 -->
-    <div class="col-12 col-lg-6">
+    <div class="col-12 col-xl-6">
         <div class="card h-100 shadow-sm">
             <div class="card-body">
                 <h6 class="card-header-title mb-2">AI Terpopuler (Peringkat 1 TOPSIS)</h6>
@@ -129,7 +129,7 @@
     </div>
 
     <!-- AI Participation Frequency -->
-    <div class="col-12 col-lg-6">
+    <div class="col-12 col-xl-6">
         <div class="card h-100 shadow-sm">
             <div class="card-body">
                 <h6 class="card-header-title mb-2">Keikutsertaan Evaluasi per AI Tool</h6>
@@ -174,7 +174,7 @@
                 <p class="text-secondary small mb-3">Distribusi volume proyek yang didaftarkan agensi Notch Creative berdasarkan jenis pekerjaannya:</p>
                 <div class="row g-3">
                     @foreach($projectsByType as $type)
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                             <div class="p-3 border rounded-3 bg-light d-flex align-items-center justify-content-between card-hover">
                                 <div>
                                     <h6 class="mb-0 fw-bold text-dark text-truncate" style="max-width: 150px;">{{ $type->nama_proyek }}</h6>

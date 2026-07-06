@@ -12,42 +12,54 @@ use App\Http\Controllers\AIToolMappingController;
 use App\Http\Controllers\EvaluationHistoryController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Auth\LoginController;
 
-// Dashboard Routes
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/dashboard', [DashboardController::class, 'index']);
+// Public Authentication Routes
+Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('login', [LoginController::class, 'login'])->name('login.post');
+Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-// Master Data Resource Routes
-Route::resource('ai-tools', AIToolController::class);
-Route::resource('criteria', CriterionController::class);
-Route::resource('criterion-weights', CriterionWeightController::class)->only(['index', 'store']);
-Route::resource('project-types', ProjectTypeController::class);
-Route::get('project-types/{projectType}/ai-tools', [ProjectTypeController::class, 'getAiTools'])->name('project-types.ai-tools');
+// Protected Workspace Routes (Auth Required)
+Route::middleware(['auth'])->group(function () {
 
-// AI Mapping Routes
-Route::get('ai-mappings', [AIToolMappingController::class, 'index'])->name('ai-mappings.index');
-Route::get('ai-mappings/{projectType}/edit', [AIToolMappingController::class, 'edit'])->name('ai-mappings.edit');
-Route::put('ai-mappings/{projectType}', [AIToolMappingController::class, 'update'])->name('ai-mappings.update');
+    // Dashboard
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 
-// Project Assessment CRUD Routes
-Route::resource('projects', ProjectController::class);
+    // Shared AJAX endpoint for project form checkboxes initialization
+    Route::get('project-types/{projectType}/ai-tools', [ProjectTypeController::class, 'getAiTools'])->name('project-types.ai-tools');
 
-// Decision Matrix Routes
-Route::get('matrix', [DecisionMatrixController::class, 'index'])->name('matrix.index');
-Route::post('matrix', [DecisionMatrixController::class, 'store'])->name('matrix.store');
+    // General Routes (Access control and query scoping enforced inside controllers)
+    Route::resource('projects', ProjectController::class);
+    Route::post('projects/{project}/calculate', [ProjectController::class, 'calculateTopsis'])->name('projects.calculate');
+    Route::get('projects/{project}/results', [ProjectController::class, 'results'])->name('projects.results');
+    Route::get('projects/{project}/calculation', [ProjectController::class, 'calculationDetails'])->name('projects.calculation');
 
-// Project TOPSIS Operations & Results
-Route::post('projects/{project}/calculate', [ProjectController::class, 'calculateTopsis'])->name('projects.calculate');
-Route::get('projects/{project}/results', [ProjectController::class, 'results'])->name('projects.results');
-Route::get('projects/{project}/calculation', [ProjectController::class, 'calculationDetails'])->name('projects.calculation');
+    Route::get('matrix', [DecisionMatrixController::class, 'index'])->name('matrix.index');
+    Route::post('matrix', [DecisionMatrixController::class, 'store'])->name('matrix.store');
 
-// Evaluation History, PDF, Activity Logs, and Statistics
-Route::get('history', [EvaluationHistoryController::class, 'index'])->name('history.index');
-Route::get('history/{assessment}', [EvaluationHistoryController::class, 'show'])->name('history.show');
-Route::get('history/{assessment}/pdf', [EvaluationHistoryController::class, 'exportPdf'])->name('history.pdf');
-Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
-Route::get('statistics', [StatisticController::class, 'index'])->name('statistics.index');
+    Route::get('history', [EvaluationHistoryController::class, 'index'])->name('history.index');
+    Route::get('history/{assessment}', [EvaluationHistoryController::class, 'show'])->name('history.show');
+    Route::get('history/{assessment}/pdf', [EvaluationHistoryController::class, 'exportPdf'])->name('history.pdf');
 
-// Coming Soon Route for pending features
-Route::view('coming-soon', 'errors.coming-soon')->name('coming-soon');
+    // Admin & Manager Only Routes
+    Route::middleware(['role:admin,manager'])->group(function () {
+        Route::get('statistics', [StatisticController::class, 'index'])->name('statistics.index');
+    });
 
+    // Administrator Only Routes
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('users', UserController::class);
+        Route::resource('ai-tools', AIToolController::class);
+        Route::resource('criteria', CriterionController::class);
+        Route::resource('criterion-weights', CriterionWeightController::class)->only(['index', 'store']);
+        Route::resource('project-types', ProjectTypeController::class)->except(['getAiTools']);
+        
+        Route::get('ai-mappings', [AIToolMappingController::class, 'index'])->name('ai-mappings.index');
+        Route::get('ai-mappings/{projectType}/edit', [AIToolMappingController::class, 'edit'])->name('ai-mappings.edit');
+        Route::put('ai-mappings/{projectType}', [AIToolMappingController::class, 'update'])->name('ai-mappings.update');
+        
+        Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+    });
+});

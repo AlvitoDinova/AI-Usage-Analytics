@@ -87,7 +87,9 @@
                         <tr>
                             <th class="ps-3" style="width: 80px;">No</th>
                             <th>Aktivitas Audit Trail</th>
-                            <th style="width: 250px;">Tanggal & Waktu Aktivitas</th>
+                            <th>User (Aktor)</th>
+                            <th style="width: 140px;">IP Address</th>
+                            <th style="width: 200px;">Tanggal & Waktu Aktivitas</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,6 +103,10 @@
                                     <!-- Use dynamic badges based on keywords in log text -->
                                     @if(str_contains(strtolower($log->aktivitas), 'gagal'))
                                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle me-1" style="font-size: 0.65rem;">Gagal</span>
+                                    @elseif(str_contains(strtolower($log->aktivitas), 'login'))
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle me-1" style="font-size: 0.65rem;">Login</span>
+                                    @elseif(str_contains(strtolower($log->aktivitas), 'logout'))
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle me-1" style="font-size: 0.65rem;">Logout</span>
                                     @elseif(str_contains(strtolower($log->aktivitas), 'topsis'))
                                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1" style="font-size: 0.65rem;">TOPSIS</span>
                                     @elseif(str_contains(strtolower($log->aktivitas), 'hapus'))
@@ -114,6 +120,21 @@
                                     @endif
                                     
                                     {{ $log->aktivitas }}
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark mb-0.5" style="font-size: 0.82rem;">{{ $log->user ?: 'Guest' }}</div>
+                                    @if($log->role === 'admin')
+                                        <span class="badge bg-danger-subtle text-danger" style="font-size: 0.6rem;">Admin</span>
+                                    @elseif($log->role === 'manager')
+                                        <span class="badge bg-warning-subtle text-warning text-dark" style="font-size: 0.6rem;">Manager</span>
+                                    @elseif($log->role === 'employee')
+                                        <span class="badge bg-info-subtle text-info text-dark" style="font-size: 0.6rem;">Employee</span>
+                                    @else
+                                        <span class="badge bg-light text-secondary border" style="font-size: 0.6rem;">{{ $log->role ?: 'guest' }}</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="text-secondary" style="font-family: monospace; font-size: 0.8rem;">{{ $log->ip_address ?: '—' }}</span>
                                 </td>
                                 <td>
                                     <i class="bi bi-clock-history text-muted me-1 small"></i>

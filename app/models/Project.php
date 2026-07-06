@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Project extends Model
 {
@@ -13,6 +14,7 @@ class Project extends Model
     protected $fillable = [
         'project_type_id',
         'nama_proyek',
+        'owner_id',
         'client',
         'deskripsi',
         'status',
@@ -24,12 +26,17 @@ class Project extends Model
         return $this->belongsTo(ProjectType::class, 'project_type_id');
     }
 
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
     public function assessment(): HasOne
     {
         return $this->hasOne(Assessment::class, 'project_id');
     }
 
-    public function aiTools()
+    public function aiTools(): BelongsToMany
     {
         return $this->belongsToMany(AITool::class, 'project_ai_tools', 'project_id', 'ai_tool_id')->withTimestamps();
     }

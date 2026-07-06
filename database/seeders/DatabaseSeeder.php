@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
                 'id' => 1,
                 'project_type_id' => 2, // Graphic Design
                 'nama_proyek' => 'Campaign Q3 Notch Creative',
+                'owner_id' => 3,
                 'client' => 'PT Notch Digital',
                 'deskripsi' => 'Desain grafis media kampanye Q3.',
                 'status' => 'Draft',
@@ -35,6 +36,7 @@ class DatabaseSeeder extends Seeder
                 'id' => 2,
                 'project_type_id' => 1, // Copywriting
                 'nama_proyek' => 'Branding Notch Agency',
+                'owner_id' => 3,
                 'client' => 'Notch HQ',
                 'deskripsi' => 'Riset copywriting untuk branding agensi.',
                 'status' => 'Draft',

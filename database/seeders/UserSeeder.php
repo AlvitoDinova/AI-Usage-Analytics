@@ -13,19 +13,31 @@ class UserSeeder extends Seeder
         DB::table('users')->insertOrIgnore([
             [
                 'id' => 1,
-                'nama' => 'Administrator',
-                'email' => 'admin@notchcreative.com',
+                'name' => 'Administrator',
+                'email' => 'admin@ainsight.test',
                 'password' => Hash::make('password'),
-                'role_id' => 1,
+                'role' => 'admin',
+                'status' => 'active',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'id' => 2,
-                'nama' => 'Demo User',
-                'email' => 'user@notchcreative.com',
+                'name' => 'Manager',
+                'email' => 'manager@ainsight.test',
                 'password' => Hash::make('password'),
-                'role_id' => 2,
+                'role' => 'manager',
+                'status' => 'active',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'id' => 3,
+                'name' => 'Employee',
+                'email' => 'employee@ainsight.test',
+                'password' => Hash::make('password'),
+                'role' => 'employee',
+                'status' => 'active',
                 'created_at' => now(),
                 'updated_at' => now()
             ]

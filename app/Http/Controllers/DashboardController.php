@@ -16,67 +16,121 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        // Eager count directly from database tables for real-time accuracy
-        $totalAi = AITool::count();
-        $totalCriteria = Criterion::count();
-        $totalProyek = Project::count();
-        $totalEvaluasi = Project::where('status', 'Selesai')->count();
+        $user = auth()->user();
 
-        // 1. Get last evaluated project details
-        $lastEvaluatedProject = Project::where('status', 'Selesai')
-            ->orderBy('updated_at', 'desc')
-            ->first();
+        if ($user->role === 'admin') {
+            // Eager count directly from database tables for real-time accuracy
+            $totalAi = AITool::count();
+            $totalCriteria = Criterion::count();
+            $totalProyek = Project::count();
+            $totalEvaluasi = Project::where('status', 'Selesai')->count();
 
-        $aiTerbaikTerakhir = '-';
-        $proyekTerakhir = '-';
+            // 1. Get last evaluated project details
+            $lastEvaluatedProject = Project::where('status', 'Selesai')
+                ->orderBy('updated_at', 'desc')
+                ->first();
 
-        if ($lastEvaluatedProject) {
-            $proyekTerakhir = $lastEvaluatedProject->nama_proyek;
+            $aiTerbaikTerakhir = '-';
+            $proyekTerakhir = '-';
 
-            // Get assessment for this project
-            $assessment = Assessment::where('project_id', $lastEvaluatedProject->id)->first();
-            if ($assessment) {
-                $bestAi = TopsisResult::with('aiTool')
-                    ->where('assessment_id', $assessment->id)
-                    ->where('ranking', 1)
-                    ->first();
-                if ($bestAi && $bestAi->aiTool) {
-                    $aiTerbaikTerakhir = $bestAi->aiTool->nama_ai;
+            if ($lastEvaluatedProject) {
+                $proyekTerakhir = $lastEvaluatedProject->nama_proyek;
+
+                // Get assessment for this project
+                $assessment = Assessment::where('project_id', $lastEvaluatedProject->id)->orderBy('id', 'desc')->first();
+                if ($assessment) {
+                    $bestAi = TopsisResult::with('aiTool')
+                        ->where('assessment_id', $assessment->id)
+                        ->where('ranking', 1)
+                        ->first();
+                    if ($bestAi && $bestAi->aiTool) {
+                        $aiTerbaikTerakhir = $bestAi->aiTool->nama_ai;
+                    }
                 }
             }
+
+            // 2. Calculate evaluations count for the current month
+            $evaluasiBulanIni = Assessment::whereMonth('tanggal_penilaian', now()->month)
+                ->whereYear('tanggal_penilaian', now()->year)
+                ->count();
+
+            // 3. Get Top 5 AI tools that most frequently rank 1
+            $top5Ai = TopsisResult::where('ranking', 1)
+                ->select('ai_id', DB::raw('count(*) as total_rank1'))
+                ->groupBy('ai_id')
+                ->orderBy('total_rank1', 'desc')
+                ->limit(5)
+                ->with('aiTool')
+                ->get();
+
+            // Update statistics cache
+            Statistic::where('nama_statistik', 'total_ai_tools')->update(['nilai' => $totalAi]);
+            Statistic::where('nama_statistik', 'total_kriteria')->update(['nilai' => $totalCriteria]);
+            Statistic::where('nama_statistik', 'total_proyek')->update(['nilai' => $totalProyek]);
+            Statistic::where('nama_statistik', 'total_penilaian')->update(['nilai' => $totalEvaluasi]);
+
+            $stats = [
+                'total_ai_tools' => $totalAi,
+                'total_kriteria' => $totalCriteria,
+                'total_proyek' => $totalProyek,
+                'total_evaluasi' => $totalEvaluasi,
+                'ai_terbaik_terakhir' => $aiTerbaikTerakhir,
+                'proyek_terakhir_dievaluasi' => $proyekTerakhir,
+                'evaluasi_bulan_ini' => $evaluasiBulanIni,
+            ];
+
+            return view('user.dashboard', compact('stats', 'top5Ai'));
+        } 
+        
+        if ($user->role === 'manager') {
+            $totalProyek = Project::count();
+            $totalEvaluasi = Project::where('status', 'Selesai')->count();
+
+            // Get last evaluated project details
+            $lastEvaluatedProject = Project::where('status', 'Selesai')
+                ->orderBy('updated_at', 'desc')
+                ->first();
+
+            $aiTerbaikTerakhir = '-';
+            $proyekTerakhir = '-';
+
+            if ($lastEvaluatedProject) {
+                $proyekTerakhir = $lastEvaluatedProject->nama_proyek;
+
+                // Get assessment for this project
+                $assessment = Assessment::where('project_id', $lastEvaluatedProject->id)->orderBy('id', 'desc')->first();
+                if ($assessment) {
+                    $bestAi = TopsisResult::with('aiTool')
+                        ->where('assessment_id', $assessment->id)
+                        ->where('ranking', 1)
+                        ->first();
+                    if ($bestAi && $bestAi->aiTool) {
+                        $aiTerbaikTerakhir = $bestAi->aiTool->nama_ai;
+                    }
+                }
+            }
+
+            $stats = [
+                'total_proyek' => $totalProyek,
+                'total_evaluasi' => $totalEvaluasi,
+                'ai_terbaik_terakhir' => $aiTerbaikTerakhir,
+                'proyek_terakhir_dievaluasi' => $proyekTerakhir,
+            ];
+
+            return view('manager.dashboard', compact('stats'));
         }
 
-        // 2. Calculate evaluations count for the current month
-        $evaluasiBulanIni = Assessment::whereMonth('tanggal_penilaian', now()->month)
-            ->whereYear('tanggal_penilaian', now()->year)
-            ->count();
-
-        // 3. Get Top 5 AI tools that most frequently rank 1
-        $top5Ai = TopsisResult::where('ranking', 1)
-            ->select('ai_id', DB::raw('count(*) as total_rank1'))
-            ->groupBy('ai_id')
-            ->orderBy('total_rank1', 'desc')
-            ->limit(5)
-            ->with('aiTool')
-            ->get();
-
-        // Update statistics cache
-        Statistic::where('nama_statistik', 'total_ai_tools')->update(['nilai' => $totalAi]);
-        Statistic::where('nama_statistik', 'total_kriteria')->update(['nilai' => $totalCriteria]);
-        Statistic::where('nama_statistik', 'total_proyek')->update(['nilai' => $totalProyek]);
-        Statistic::where('nama_statistik', 'total_penilaian')->update(['nilai' => $totalEvaluasi]);
+        // employee
+        $totalProjects = Project::where('owner_id', $user->id)->count();
+        $completedProjects = Project::where('owner_id', $user->id)->where('status', 'Selesai')->count();
+        $pendingProjects = Project::where('owner_id', $user->id)->whereIn('status', ['Draft', 'Dinilai'])->count();
 
         $stats = [
-            'total_ai_tools' => $totalAi,
-            'total_kriteria' => $totalCriteria,
-            'total_proyek' => $totalProyek,
-            'total_evaluasi' => $totalEvaluasi,
-            'ai_terbaik_terakhir' => $aiTerbaikTerakhir,
-            'proyek_terakhir_dievaluasi' => $proyekTerakhir,
-            'evaluasi_bulan_ini' => $evaluasiBulanIni,
+            'total_projects' => $totalProjects,
+            'completed_projects' => $completedProjects,
+            'pending_projects' => $pendingProjects,
         ];
 
-        return view('user.dashboard', compact('stats', 'top5Ai'));
+        return view('employee.dashboard', compact('stats', 'user'));
     }
 }
-

@@ -5,17 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'nama',
+        'name',
         'email',
         'password',
-        'role_id',
+        'role',
+        'status',
     ];
 
     protected $hidden = [
@@ -30,8 +31,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function role(): BelongsTo
+    public function projects(): HasMany
     {
-        return $this->belongsTo(Role::class, 'role_id');
+        return $this->hasMany(Project::class, 'owner_id');
     }
 }

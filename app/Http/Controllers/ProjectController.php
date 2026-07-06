@@ -20,6 +20,14 @@ use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
+    private function authorizeProject(Project $project): void
+    {
+        $user = auth()->user();
+        if ($user->role === 'employee' && $project->owner_id !== $user->id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk proyek ini.');
+        }
+    }
+
     private function updateStatsCache(): void
     {
         Statistic::where('nama_statistik', 'total_proyek')
@@ -34,7 +42,10 @@ class ProjectController extends Controller
     {
         $search = $request->input('search');
 
-        $projects = Project::with('projectType')
+        $projects = Project::with(['projectType', 'owner'])
+            ->when(auth()->user()->role === 'employee', function ($query) {
+                return $query->where('owner_id', auth()->id());
+            })
             ->when($search, function ($query, $search) {
                 return $query->where('nama_proyek', 'like', "%{$search}%")
                              ->orWhere('client', 'like', "%{$search}%");
@@ -54,7 +65,10 @@ class ProjectController extends Controller
 
     public function store(StoreProjectRequest $request): RedirectResponse
     {
-        $project = Project::create($request->validated());
+        $validated = $request->validated();
+        $validated['owner_id'] = auth()->id();
+
+        $project = Project::create($validated);
         $project->aiTools()->sync($request->input('ai_tools', []));
         $this->updateStatsCache();
 
@@ -68,6 +82,7 @@ class ProjectController extends Controller
 
     public function show(Project $project): View
     {
+        $this->authorizeProject($project);
         $project->load('projectType');
         
         // Fetch project-specific AI Tools and Criteria to build the Decision Matrix representation
@@ -82,6 +97,7 @@ class ProjectController extends Controller
 
     public function edit(Project $project): View
     {
+        $this->authorizeProject($project);
         $projectTypes = ProjectType::orderBy('nama_proyek', 'asc')->get();
         $allAiTools = AITool::where('status', 'aktif')->orderBy('nama_ai', 'asc')->get();
         $selectedAiIds = $project->aiTools->pluck('id')->toArray();
@@ -123,6 +139,7 @@ class ProjectController extends Controller
 
     public function destroy(Project $project): RedirectResponse
     {
+        $this->authorizeProject($project);
         $projectName = $project->nama_proyek;
         $project->delete();
         $this->updateStatsCache();
@@ -137,6 +154,7 @@ class ProjectController extends Controller
 
     public function calculateTopsis(Project $project, TopsisService $topsisService): RedirectResponse
     {
+        $this->authorizeProject($project);
         try {
             // Run TOPSIS Manual Service Engine
             $topsisService->calculate($project);
@@ -168,6 +186,7 @@ class ProjectController extends Controller
 
     public function results(Project $project): View
     {
+        $this->authorizeProject($project);
         $assessment = Assessment::where('project_id', $project->id)->orderBy('id', 'desc')->first();
         
         $results = collect();
@@ -186,6 +205,7 @@ class ProjectController extends Controller
 
     public function calculationDetails(Project $project): View
     {
+        $this->authorizeProject($project);
         $assessment = Assessment::where('project_id', $project->id)->orderBy('id', 'desc')->first();
 
         $logs = [];

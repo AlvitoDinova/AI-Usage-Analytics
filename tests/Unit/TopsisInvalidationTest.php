@@ -89,7 +89,15 @@ class TopsisInvalidationTest extends TestCase
 
         // 5. Update the project through Controller logic (AI Tools list changes)
         // Simulate a request to update with a changed list of AI Tools (ai1, ai3)
-        $response = $this->put(route('projects.update', $project->id), [
+        $user = \App\Models\User::create([
+            'name' => 'Demo Admin',
+            'email' => 'admin_test@ainsight.test',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($user)->put(route('projects.update', $project->id), [
             'nama_proyek' => 'Logo Campaign Revised',
             'client' => 'PT Client',
             'project_type_id' => $projectType->id,

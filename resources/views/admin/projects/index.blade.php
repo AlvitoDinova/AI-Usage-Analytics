@@ -40,6 +40,9 @@
                         <tr>
                             <th class="ps-4" style="width: 60px;">No</th>
                             <th>Nama Proyek</th>
+                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
+                                <th>Pemilik Project</th>
+                            @endif
                             <th>Client / Mitra</th>
                             <th>Jenis Pekerjaan</th>
                             <th style="width: 140px;">Tanggal</th>
@@ -52,6 +55,9 @@
                             <tr>
                                 <td class="ps-4 text-muted">{{ $projects->firstItem() + $index }}</td>
                                 <td class="fw-bold text-dark">{{ $project->nama_proyek }}</td>
+                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
+                                    <td class="fw-semibold text-secondary" style="font-size: 0.82rem;">{{ $project->owner ? $project->owner->name : 'System' }}</td>
+                                @endif
                                 <td>{{ $project->client }}</td>
                                 <td>
                                     <span class="badge bg-light text-secondary border px-2 py-1" style="font-size: 0.72rem;">
