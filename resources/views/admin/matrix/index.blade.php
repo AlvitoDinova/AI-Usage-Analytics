@@ -106,7 +106,12 @@
                     <div class="text-muted" style="font-size: 0.72rem;">
                         * Simpan akan otomatis merubah status proyek menjadi <strong>Dinilai</strong>.
                     </div>
-                    <button type="submit" class="btn btn-sm btn-primary rounded-2 px-4">Simpan Matriks Keputusan</button>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('projects.show', $selectedProject->id) }}" class="btn btn-sm btn-outline-secondary rounded-2">
+                            <i class="bi bi-arrow-left-short"></i> Kembali ke Detail Project
+                        </a>
+                        <button type="submit" class="btn btn-sm btn-primary rounded-2 px-4">Simpan Matriks Keputusan</button>
+                    </div>
                 </div>
             </form>
         </div>

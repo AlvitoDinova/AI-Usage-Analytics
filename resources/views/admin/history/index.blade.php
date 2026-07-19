@@ -77,7 +77,10 @@
             <div class="text-center p-5">
                 <i class="bi bi-journal-x text-muted display-4 d-block mb-3"></i>
                 <h6 class="fw-bold text-dark mb-1">Belum Ada Riwayat Evaluasi</h6>
-                <p class="text-secondary small">Data evaluasi kosong atau tidak ditemukan dengan filter saat ini.</p>
+                <p class="text-secondary small mb-3">Data evaluasi kosong atau tidak ditemukan dengan filter saat ini.</p>
+                <a href="{{ route('projects.create') }}" class="btn btn-sm btn-success px-3 rounded-2">
+                    <i class="bi bi-play-circle-fill me-1"></i> Mulai Evaluasi
+                </a>
             </div>
         @else
             <div class="table-responsive">

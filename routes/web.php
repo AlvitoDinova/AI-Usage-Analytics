@@ -26,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/about', [DashboardController::class, 'about'])->name('about');
 
     // Shared AJAX endpoint for project form checkboxes initialization
     Route::get('project-types/{projectType}/ai-tools', [ProjectTypeController::class, 'getAiTools'])->name('project-types.ai-tools');

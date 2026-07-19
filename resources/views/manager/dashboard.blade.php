@@ -25,13 +25,43 @@
         </div>
     </div>
 
+    <!-- User Aktif -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm border-0 bg-white card-hover">
+            <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-secondary small fw-bold mb-1">User Aktif</h6>
+                    <h3 class="mb-0 fw-bold text-dark">{{ $stats['total_user_aktif'] }}</h3>
+                </div>
+                <div class="metric-icon-box bg-info-subtle text-info border border-info-subtle">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Draft -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm border-0 bg-white card-hover">
+            <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-secondary small fw-bold mb-1">Project Draft</h6>
+                    <h3 class="mb-0 fw-bold text-secondary">{{ $stats['total_draft_proyek'] }}</h3>
+                </div>
+                <div class="metric-icon-box bg-secondary-subtle text-secondary border border-secondary-subtle">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Total Evaluations -->
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card h-100 shadow-sm border-0 bg-white card-hover">
             <div class="card-body p-3 d-flex align-items-center justify-content-between">
                 <div>
                     <h6 class="text-secondary small fw-bold mb-1">Evaluasi Selesai</h6>
-                    <h3 class="mb-0 fw-bold text-dark">{{ $stats['total_evaluasi'] }}</h3>
+                    <h3 class="mb-0 fw-bold text-success">{{ $stats['total_evaluasi'] }}</h3>
                 </div>
                 <div class="metric-icon-box bg-success-subtle text-success border border-success-subtle">
                     <i class="bi bi-check-circle-fill"></i>
@@ -39,7 +69,9 @@
             </div>
         </div>
     </div>
+</div>
 
+<div class="row g-4 mb-4">
     <!-- Last Evaluated Project -->
     <div class="col-12 col-md-6 col-lg-3">
         <div class="card h-100 shadow-sm border-0 bg-white card-hover">
@@ -51,7 +83,7 @@
                     </h5>
                 </div>
                 <div class="metric-icon-box bg-warning-subtle text-warning border border-warning-subtle">
-                    <i class="bi bi-calendar-event-fill"></i>
+                    <i class="bi bi-file-earmark-check-fill"></i>
                 </div>
             </div>
         </div>
@@ -67,8 +99,40 @@
                         {{ $stats['ai_terbaik_terakhir'] }}
                     </h5>
                 </div>
-                <div class="metric-icon-box bg-info-subtle text-info border border-info-subtle">
+                <div class="metric-icon-box bg-success-subtle text-success border border-success-subtle">
                     <i class="bi bi-award-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evaluasi Bulan Ini -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm border-0 bg-white card-hover">
+            <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-secondary small fw-bold mb-1">Evaluasi Bulan Ini</h6>
+                    <h3 class="mb-0 fw-bold text-primary">{{ $stats['evaluasi_bulan_ini'] }}</h3>
+                </div>
+                <div class="metric-icon-box bg-primary-subtle text-primary border border-primary-subtle">
+                    <i class="bi bi-calendar-event-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Terpopuler Rank 1 -->
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm border-0 bg-white card-hover">
+            <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-secondary small fw-bold mb-1">AI Terfavorit (#1)</h6>
+                    <h5 class="mb-0 fw-bold text-warning text-truncate" style="max-width: 140px;" title="{{ $stats['ai_terfavorit'] }}">
+                        {{ $stats['ai_terfavorit'] }}
+                    </h5>
+                </div>
+                <div class="metric-icon-box bg-warning-subtle text-warning border border-warning-subtle">
+                    <i class="bi bi-trophy-fill"></i>
                 </div>
             </div>
         </div>

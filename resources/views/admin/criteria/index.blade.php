@@ -91,8 +91,12 @@
             <div class="text-center py-5">
                 <div class="fs-1 text-muted mb-3"><i class="bi bi-list-stars"></i></div>
                 <h6 class="fw-bold mb-1">Tidak Ada Data Kriteria</h6>
-                <p class="text-muted mb-3" style="font-size: 0.75rem;">Silakan tambahkan data Kriteria baru menggunakan tombol di atas.</p>
-                @if($search)
+                <p class="text-muted mb-3" style="font-size: 0.75rem;">Silakan tambahkan data Kriteria baru menggunakan tombol di bawah ini.</p>
+                @if(!$search)
+                    <a href="{{ route('criteria.create') }}" class="btn btn-sm btn-primary px-3 rounded-2">
+                        <i class="bi bi-plus-lg me-1"></i> Tambah Kriteria
+                    </a>
+                @else
                     <a href="{{ route('criteria.index') }}" class="btn btn-sm btn-outline-secondary px-3 rounded-2">Bersihkan Pencarian</a>
                 @endif
             </div>

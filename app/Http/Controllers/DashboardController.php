@@ -9,6 +9,7 @@ use App\Models\Criterion;
 use App\Models\Project;
 use App\Models\Assessment;
 use App\Models\TopsisResult;
+use App\Models\User;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +19,27 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
+        // 1. Get Top 1 AI tool that most frequently ranks 1
+        $topRank1 = TopsisResult::where('ranking', 1)
+            ->select('ai_id', DB::raw('count(*) as total_rank1'))
+            ->groupBy('ai_id')
+            ->orderBy('total_rank1', 'desc')
+            ->first();
+        
+        $aiTerfavorit = '-';
+        if ($topRank1) {
+            $aiTool = AITool::find($topRank1->ai_id);
+            if ($aiTool) {
+                $aiTerfavorit = $aiTool->nama_ai . ' (' . $topRank1->total_rank1 . 'x)';
+            }
+        }
+
+        // 2. Count Active Users
+        $totalActiveUsers = User::where('status', 'active')->count();
+
+        // 3. Count Draft projects
+        $totalDraft = Project::where('status', 'Draft')->count();
+
         if ($user->role === 'admin') {
             // Eager count directly from database tables for real-time accuracy
             $totalAi = AITool::count();
@@ -25,7 +47,7 @@ class DashboardController extends Controller
             $totalProyek = Project::count();
             $totalEvaluasi = Project::where('status', 'Selesai')->count();
 
-            // 1. Get last evaluated project details
+            // Get last evaluated project details
             $lastEvaluatedProject = Project::where('status', 'Selesai')
                 ->orderBy('updated_at', 'desc')
                 ->first();
@@ -49,12 +71,12 @@ class DashboardController extends Controller
                 }
             }
 
-            // 2. Calculate evaluations count for the current month
+            // Calculate evaluations count for the current month
             $evaluasiBulanIni = Assessment::whereMonth('tanggal_penilaian', now()->month)
                 ->whereYear('tanggal_penilaian', now()->year)
                 ->count();
 
-            // 3. Get Top 5 AI tools that most frequently rank 1
+            // Get Top 5 AI tools that most frequently rank 1
             $top5Ai = TopsisResult::where('ranking', 1)
                 ->select('ai_id', DB::raw('count(*) as total_rank1'))
                 ->groupBy('ai_id')
@@ -74,9 +96,12 @@ class DashboardController extends Controller
                 'total_kriteria' => $totalCriteria,
                 'total_proyek' => $totalProyek,
                 'total_evaluasi' => $totalEvaluasi,
+                'total_draft_proyek' => $totalDraft,
+                'total_user_aktif' => $totalActiveUsers,
+                'evaluasi_bulan_ini' => $evaluasiBulanIni,
                 'ai_terbaik_terakhir' => $aiTerbaikTerakhir,
                 'proyek_terakhir_dievaluasi' => $proyekTerakhir,
-                'evaluasi_bulan_ini' => $evaluasiBulanIni,
+                'ai_terfavorit' => $aiTerfavorit,
             ];
 
             return view('user.dashboard', compact('stats', 'top5Ai'));
@@ -110,11 +135,19 @@ class DashboardController extends Controller
                 }
             }
 
+            $evaluasiBulanIni = Assessment::whereMonth('tanggal_penilaian', now()->month)
+                ->whereYear('tanggal_penilaian', now()->year)
+                ->count();
+
             $stats = [
                 'total_proyek' => $totalProyek,
                 'total_evaluasi' => $totalEvaluasi,
+                'total_draft_proyek' => $totalDraft,
+                'total_user_aktif' => $totalActiveUsers,
+                'evaluasi_bulan_ini' => $evaluasiBulanIni,
                 'ai_terbaik_terakhir' => $aiTerbaikTerakhir,
                 'proyek_terakhir_dievaluasi' => $proyekTerakhir,
+                'ai_terfavorit' => $aiTerfavorit,
             ];
 
             return view('manager.dashboard', compact('stats'));
@@ -132,5 +165,10 @@ class DashboardController extends Controller
         ];
 
         return view('employee.dashboard', compact('stats', 'user'));
+    }
+
+    public function about(): View
+    {
+        return view('admin.about');
     }
 }

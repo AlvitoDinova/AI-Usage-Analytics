@@ -106,8 +106,12 @@
             <div class="text-center py-5">
                 <div class="fs-1 text-muted mb-3"><i class="bi bi-robot"></i></div>
                 <h6 class="fw-bold mb-1">Tidak Ada Data AI Tools</h6>
-                <p class="text-muted mb-3" style="font-size: 0.75rem;">Silakan tambahkan data AI Tool baru menggunakan tombol di atas.</p>
-                @if($search)
+                <p class="text-muted mb-3" style="font-size: 0.75rem;">Silakan tambahkan data AI Tool baru menggunakan tombol di bawah ini.</p>
+                @if(!$search)
+                    <a href="{{ route('ai-tools.create') }}" class="btn btn-sm btn-primary px-3 rounded-2">
+                        <i class="bi bi-plus-lg me-1"></i> Tambah AI Tool
+                    </a>
+                @else
                     <a href="{{ route('ai-tools.index') }}" class="btn btn-sm btn-outline-secondary px-3 rounded-2">Bersihkan Pencarian</a>
                 @endif
             </div>

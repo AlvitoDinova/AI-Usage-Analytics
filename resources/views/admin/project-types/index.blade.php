@@ -89,8 +89,12 @@
             <div class="text-center py-5">
                 <div class="fs-1 text-muted mb-3"><i class="bi bi-folder-fill"></i></div>
                 <h6 class="fw-bold mb-1">Tidak Ada Data Jenis Proyek</h6>
-                <p class="text-muted mb-3" style="font-size: 0.75rem;">Silakan tambahkan data jenis proyek baru menggunakan tombol di atas.</p>
-                @if($search)
+                <p class="text-muted mb-3" style="font-size: 0.75rem;">Silakan tambahkan data jenis proyek baru menggunakan tombol di bawah ini.</p>
+                @if(!$search)
+                    <a href="{{ route('project-types.create') }}" class="btn btn-sm btn-primary px-3 rounded-2">
+                        <i class="bi bi-plus-lg me-1"></i> Tambah Jenis Proyek
+                    </a>
+                @else
                     <a href="{{ route('project-types.index') }}" class="btn btn-sm btn-outline-secondary px-3 rounded-2">Bersihkan Pencarian</a>
                 @endif
             </div>

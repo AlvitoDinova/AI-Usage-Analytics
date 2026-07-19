@@ -58,7 +58,14 @@
             <div class="text-center p-5">
                 <i class="bi bi-people text-muted display-4 d-block mb-3"></i>
                 <h6 class="fw-bold text-dark mb-1">Belum Ada User</h6>
-                <p class="text-secondary small">Data user kosong atau tidak ditemukan dengan kata kunci pencarian Anda.</p>
+                <p class="text-secondary small mb-3">Data user kosong atau tidak ditemukan dengan kata kunci pencarian Anda.</p>
+                @if(!$search)
+                    <a href="{{ route('users.create') }}" class="btn btn-sm btn-primary px-3 rounded-2">
+                        <i class="bi bi-plus-circle-fill me-1"></i> Tambah User
+                    </a>
+                @else
+                    <a href="{{ route('users.index') }}" class="btn btn-sm btn-outline-secondary px-3 rounded-2">Bersihkan Pencarian</a>
+                @endif
             </div>
         @else
             <div class="table-responsive">

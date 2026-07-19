@@ -174,15 +174,15 @@
                 <p class="text-secondary small mb-3">Distribusi volume proyek yang didaftarkan agensi Notch Creative berdasarkan jenis pekerjaannya:</p>
                 <div class="row g-3">
                     @foreach($projectsByType as $type)
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <div class="p-3 border rounded-3 bg-light d-flex align-items-center justify-content-between card-hover">
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-dark text-truncate" style="max-width: 150px;">{{ $type->nama_proyek }}</h6>
-                                    <span class="text-secondary" style="font-size: 0.68rem;">Jenis Kategori</span>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="p-3 border rounded-3 bg-light d-flex align-items-center justify-content-between card-hover h-100">
+                                <div class="pe-2">
+                                    <h6 class="mb-1 fw-bold text-dark">{{ $type->nama_proyek }}</h6>
+                                    <span class="text-secondary d-block" style="font-size: 0.68rem;">Jenis Kategori</span>
                                 </div>
-                                <div class="text-end">
-                                    <h4 class="mb-0 fw-extrabold text-primary">{{ $type->projects_count }}</h4>
-                                    <span class="text-muted" style="font-size: 0.62rem;">Proyek</span>
+                                <div class="text-end flex-shrink-0">
+                                    <h4 class="mb-0 fw-bold text-primary">{{ $type->projects_count }}</h4>
+                                    <span class="text-muted d-block" style="font-size: 0.62rem;">Proyek</span>
                                 </div>
                             </div>
                         </div>

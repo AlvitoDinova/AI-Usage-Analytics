@@ -193,6 +193,19 @@
             justify-content: center;
             font-size: 1.4rem;
         }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                left: -240px;
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .workspace {
+                margin-left: 0 !important;
+            }
+        }
     </style>
     @yield('styles')
 </head>
@@ -209,6 +222,9 @@
             <li class="sidebar-menu-header">Umum</li>
             <li class="sidebar-menu-item {{ Request::is('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('dashboard') }}"><i class="bi bi-grid-fill"></i>Dashboard</a>
+            </li>
+            <li class="sidebar-menu-item {{ Request::is('about') ? 'active' : '' }}">
+                <a href="{{ route('about') }}"><i class="bi bi-info-circle-fill"></i>Tentang Sistem</a>
             </li>
             
             @if(auth()->check())
@@ -282,12 +298,17 @@
 
     <!-- Main Content Workspace -->
     <div class="workspace">
-        <div class="topbar">
-            <div>
-                <h6 class="topbar-title">Notch Creative Agency — Dashboard</h6>
+        <div class="topbar d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 h-auto py-3 py-lg-0 position-relative" style="min-height: 56px;">
+            <!-- Sidebar toggle button (absolute positioned on mobile/tablet, hidden on desktop) -->
+            <button class="btn btn-sm btn-light border d-lg-none position-absolute start-0 ms-3" type="button" id="sidebar-toggle" style="padding: 0.25rem 0.5rem; top: 12px; z-index: 10;">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            
+            <div class="w-100 text-center text-lg-start flex-grow-1">
+                <h6 class="topbar-title mb-0">Notch Creative Agency — Dashboard</h6>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <span class="topbar-date d-none d-md-inline" id="live-time"></span>
+            
+            <div class="d-flex align-items-center justify-content-center justify-content-lg-end gap-3 flex-wrap w-100 w-lg-auto">
                 @if(auth()->check())
                     <div class="dropdown">
                         <button class="btn btn-sm btn-light border dropdown-toggle d-flex align-items-center gap-2 rounded-2" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -319,19 +340,13 @@
         </div>
 
         <div class="main-content">
-            <!-- Flash Alert -->
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
+            <!-- Toast notifications are fired via SweetAlert2 scripts at the bottom -->
 
             @yield('content')
         </div>
 
         <div class="footer">
-            &copy; {{ date('Y') }} <strong>AInsight</strong>. All Rights Reserved. Skripsi TOPSIS SPK AI.
+            &copy; 2026 <strong>AInsight Version 1.0</strong>. Decision Support System using TOPSIS. Notch Creative Agency.
         </div>
     </div>
 
@@ -340,14 +355,102 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        // Update Time script
-        function updateTime() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            document.getElementById('live-time').innerText = now.toLocaleDateString('id-ID', options);
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Responsive Sidebar Toggle
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('show');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+
+            // Flash notification modals (SweetAlert2)
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: {!! json_encode(session('success')) !!},
+                    confirmButtonColor: '#2563EB'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan',
+                    text: {!! json_encode(session('error')) !!},
+                    confirmButtonColor: '#2563EB'
+                });
+            @endif
+
+            @if($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Validasi',
+                    text: {!! json_encode($errors->first()) !!},
+                    confirmButtonColor: '#2563EB'
+                });
+            @endif
+
+            // Global Double-Click and loading state prevention on form submit
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+                    
+                    submitButtons.forEach(button => {
+                        if (button.disabled) {
+                            e.preventDefault();
+                            return;
+                        }
+                        
+                        button.disabled = true;
+                        button.dataset.originalHtml = button.innerHTML;
+                        
+                        let text = button.innerText.trim();
+                        let loadingText = 'Memproses...';
+                        
+                        if (text.toLowerCase().includes('simpan')) {
+                            loadingText = 'Menyimpan...';
+                        } else if (text.toLowerCase().includes('hitung')) {
+                            loadingText = 'Menghitung TOPSIS...';
+                        } else if (text.toLowerCase().includes('tambah')) {
+                            loadingText = 'Menambahkan...';
+                        } else if (text.toLowerCase().includes('hapus')) {
+                            loadingText = 'Menghapus...';
+                        }
+                        
+                        button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> ${loadingText}`;
+                    });
+                });
+            });
+
+            // Prevent double click on PDF exports and display loading state temporarily
+            const pdfLinks = document.querySelectorAll('a[href*="/pdf"]');
+            pdfLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const originalHtml = link.innerHTML;
+                    link.classList.add('disabled');
+                    link.style.pointerEvents = 'none';
+                    link.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Export PDF...`;
+                    
+                    setTimeout(() => {
+                        link.classList.remove('disabled');
+                        link.style.pointerEvents = 'auto';
+                        link.innerHTML = originalHtml;
+                    }, 3000);
+                });
+            });
+        });
     </script>
     @yield('scripts')
 </body>

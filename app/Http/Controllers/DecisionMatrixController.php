@@ -95,7 +95,7 @@ class DecisionMatrixController extends Controller
             'aktivitas' => "Memperbarui matriks keputusan untuk proyek: '{$project->nama_proyek}'."
         ]);
 
-        return redirect()->route('matrix.index', ['project_id' => $project->id])
+        return redirect()->route('projects.show', $project->id)
             ->with('success', "Matriks keputusan berhasil disimpan. Status proyek '{$project->nama_proyek}' diperbarui menjadi 'Dinilai'.");
     }
 }

@@ -111,7 +111,11 @@
                 <div class="fs-1 text-muted mb-3"><i class="bi bi-folder-fill"></i></div>
                 <h6 class="fw-bold mb-1">Belum Ada Proyek Kreatif</h6>
                 <p class="text-muted mb-3" style="font-size: 0.75rem;">Mulai dengan menambahkan proyek baru untuk memproses kecerdasan buatan ideal.</p>
-                @if($search)
+                @if(!$search)
+                    <a href="{{ route('projects.create') }}" class="btn btn-sm btn-primary px-3 rounded-2">
+                        <i class="bi bi-plus-lg me-1"></i> Tambah Proyek
+                    </a>
+                @else
                     <a href="{{ route('projects.index') }}" class="btn btn-sm btn-outline-secondary px-3 rounded-2">Bersihkan Pencarian</a>
                 @endif
             </div>
